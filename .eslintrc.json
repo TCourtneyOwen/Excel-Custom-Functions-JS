@@ -1,0 +1,22 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "excel-custom-functions"
+  ], 
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "project": "./tsconfig.json"
+    },
+  "extends": [
+    "eslint-config-office-addins"
+  ],
+  "rules": {
+    "excel-custom-functions/no-office-read-calls": "warn",
+    "excel-custom-functions/no-office-write-calls": "error"
+  }
+}

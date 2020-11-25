@@ -14,10 +14,10 @@ module.exports = async (env, options) => {
   const config = {
     devtool: "source-map",
     entry: {
-      functions: "./src/functions/functions.js",
+      functions: "./src/functions/functions.ts",
       polyfill: "@babel/polyfill",
-      taskpane: "./src/taskpane/taskpane.js",
-      commands: "./src/commands/commands.js"
+      taskpane: "./src/taskpane/taskpane.ts",
+      commands: "./src/commands/commands.ts"
     },
     resolve: {
       extensions: [".ts", ".tsx", ".html", ".js"]
@@ -25,14 +25,14 @@ module.exports = async (env, options) => {
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.ts$/,
           exclude: /node_modules/,
-          use: {
-            loader: "babel-loader", 
-            options: {
-              presets: ["@babel/preset-env"]
-            }
-          }
+          use: "babel-loader"
+        },
+        {
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+          use: "ts-loader"
         },
         {
           test: /\.html$/,
@@ -41,7 +41,10 @@ module.exports = async (env, options) => {
         },
         {
           test: /\.(png|jpg|jpeg|gif)$/,
-          use: "file-loader"
+          loader: "file-loader",
+          options: {
+            name: '[path][name].[ext]',          
+          }
         }
       ]
     },
@@ -51,7 +54,7 @@ module.exports = async (env, options) => {
       }),
       new CustomFunctionsMetadataPlugin({
         output: "functions.json",
-        input: "./src/functions/functions.js"
+        input: "./src/functions/functions.ts"
       }),
       new HtmlWebpackPlugin({
         filename: "taskpane.html",
@@ -62,9 +65,19 @@ module.exports = async (env, options) => {
         {
           to: "taskpane.css",
           from: "./src/taskpane/taskpane.css"
+        },
+        {
+          to: "[name]." + buildType + ".[ext]",
+          from: "manifest*.xml",
+          transform(content) {
+            if (dev) {
+              return content;
+            } else {
+              return content.toString().replace(new RegExp(urlDev, "g"), urlProd);
+            }
+          }
         }
       ]),
-      
       new CopyWebpackPlugin([
         {
           to: "taskpane.css",

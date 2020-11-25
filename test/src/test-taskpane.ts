@@ -1,8 +1,8 @@
 import * as functionsJsonData from './test-data.json';
 import { sleep, closeWorkbook} from "./test-helpers";
-import { pingTestServer, sendTestResults } from "office-addin-test-helpers";
-  
-const customFunctionsData = (<any>functionsJsonData).functions;
+import { pingTestServer, sendTestResults } from "office-addin-test-helpers"; 
+import { run } from "../../src/taskpane/taskpane";
+const customFunctionsData = (<any>functionsJsonData).functions; 
 const port: number = 4201;
 let testValues = [];
 
@@ -42,19 +42,12 @@ async function runTaskpaneTest(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
         try {
             // Execute taskpane code
+            await run();
             await sleep(2000);
 
             // Get output of executed taskpane code
             await Excel.run(async context => {
-
-                // Set the range fill
-                let range = context.workbook.getSelectedRange();
-                range.load("address");
-                range.format.fill.color = "yellow";          
-                await context.sync();
-
-                // Read the range fill
-                range = context.workbook.getSelectedRange();
+                const range = context.workbook.getSelectedRange();
                 const cellFill = range.format.fill;
                 cellFill.load('color');
                 await context.sync();
@@ -64,8 +57,8 @@ async function runTaskpaneTest(): Promise<void> {
             });
         } catch {
             reject();
-        }   
-     });
+        }
+    });
 }
 
 export async function readCFData(cfName: string, readCount: number, platform: string): Promise<boolean> {
@@ -101,3 +94,4 @@ function addTestResult(resultName: string, resultValue: any) {
     data[valueKey] = resultValue;
     testValues.push(data);
 }
+

@@ -4,15 +4,16 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const CustomFunctionsMetadataPlugin = require("custom-functions-metadata-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require('path');
+const webpack = require("webpack");
 
 module.exports = async (env, options) => {
     const dev = options.mode === "development";
     const config = {
         devtool: "source-map",
         entry: {
-            commands: path.resolve(__dirname, './../src/commands/commands.js'),
-            functions: path.resolve(__dirname, './../src/functions/functions.js'),
-            polyfill: "babel-polyfill",
+            commands: path.resolve(__dirname, './../src/commands/commands.ts'),
+            functions: path.resolve(__dirname, './../src/functions/functions.ts'),
+            polyfill: "@babel/polyfill",
             taskpane: path.resolve(__dirname, './src/test-taskpane.ts'),
         },
         resolve: {
@@ -27,14 +28,9 @@ module.exports = async (env, options) => {
                     test: /\.ts$/,
                     exclude: /node_modules/,
                     use: "babel-loader"
-                },
+                },  
                 {
-                    test: /\.js$/,
-                    exclude: /node_modules/,
-                    use: "babel-loader"
-                },
-                {
-                    test: /\.ts?$/,
+                    test: /\.tsx?$/,
                     exclude: /node_modules/,
                     use: "ts-loader"
                 },
@@ -55,7 +51,7 @@ module.exports = async (env, options) => {
             }),
             new CustomFunctionsMetadataPlugin({
                 output: "functions.json",
-                input: path.resolve(__dirname, './../src/functions/functions.js')
+                input: path.resolve(__dirname, './../src/functions/functions.ts')
             }),
             new HtmlWebpackPlugin({
                 filename: "taskpane.html",
@@ -67,7 +63,7 @@ module.exports = async (env, options) => {
                     to: "taskpane.css",
                     from: path.resolve(__dirname, './../src/taskpane/taskpane.css')
                 }
-            ]),
+            ])
         ],
         devServer: {
             headers: {
